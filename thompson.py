@@ -15,13 +15,15 @@ class Thompson:
     def compilar(self):
         print(self.maquinas)
         self.paso_base("a") 
+        self.paso_base("b") 
         # self.asterisco(self.maquinas.pop())
         # self.paso_base("b")
         # self.asterisco(self.maquinas.pop())
         # self.concatenacion(self.maquinas.pop(), self.maquinas.pop())
         # print(self.maquinas)
         # self.graficar()
-        self.plus(self.maquinas.pop())
+        #self.plus(self.maquinas.pop())
+        self.OR(self.maquinas.pop(), self.maquinas.pop() )
         self.graficar()
 
     def concatenacion(self, maquina1, maquina2):
@@ -81,10 +83,50 @@ class Thompson:
         self.maquinas.append(AFN(estados,[],[]))
 
     
-    def plus(self,nfa1):
-        nfa2 = copy.deepcopy(nfa1)
-        self.asterisco(nfa1)
-        self.concatenacion(self.maquinas.pop(),nfa2)
+    def plus(self,automata):
+        automata2 = copy.deepcopy(automata)
+        self.asterisco(automata)
+        self.concatenacion(self.maquinas.pop(),automata2)
+
+
+    def OR(self,automata1,automata2):
+        
+        estados = []
+        estado_inicial = Estado("s0",[Transicion("s1","E"),Transicion("s"+str(len(automata2.estados)+1),"E")],1)
+        estado_final = Estado("s"+str(len(automata1.estados)+len(automata2.estados)+1),[],3)
+
+        automata1.estados[0].tipo = 2 
+        automata1.estados[-1].tipo = 2 
+
+        automata2.estados[0].tipo = 2
+        automata2.estados[-1].tipo = 2
+
+        estados.append(estado_inicial)
+        
+        
+        for s in automata2.estados:
+            s.etiqueta = "s"+ str((int(s.etiqueta[1])+ 1)) 
+            for t in s.transiciones:
+                t.destino =  "s" + str((int(t.destino[1])+ 1))
+            estados.append(s)
+        
+
+        estados[-1].transiciones =[Transicion("s"+str(len(automata1.estados)+len(automata2.estados)+1),"E")]
+
+        for i in automata1.estados:
+            i.etiqueta = "s"+ str((int(i.etiqueta[1])+len(automata2.estados)+ 1)) 
+            for j in i.transiciones:
+                j.destino = "s"+ str((int(j.destino[1])+len(automata2.estados)+ 1)) 
+            estados.append(i)
+
+        estados[-1].transiciones =[Transicion("s"+str(len(automata1.estados)+len(automata2.estados)+1),"E")]
+        estados.append(estado_final)
+
+        self.maquinas.append(AFN(estados,[],[]))
+
+    def interrogacion(self,automata):
+        self.paso_base("E")
+        self.OR(self.maquinas.pop(),automata)
 
 
 
