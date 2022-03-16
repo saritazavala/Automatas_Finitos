@@ -1,6 +1,7 @@
 
 from AnalizadorLexico import *
 from Estado import *
+import copy
 from transicion import *
 from AFN import *
 import graphviz 
@@ -12,12 +13,16 @@ class Thompson:
         self.expresion_regular = a.convertir_postfix()
     
     def compilar(self):
-        print(self.maquinas) 
-        self.paso_base("c")
-        self.paso_base("a")
-        self.concatenacion(self.maquinas.pop(), self.maquinas.pop())
+        print(self.maquinas)
+        self.paso_base("a") 
+        # self.asterisco(self.maquinas.pop())
+        # self.paso_base("b")
+        # self.asterisco(self.maquinas.pop())
+        # self.concatenacion(self.maquinas.pop(), self.maquinas.pop())
+        # print(self.maquinas)
+        # self.graficar()
+        self.plus(self.maquinas.pop())
         self.graficar()
-        
 
     def concatenacion(self, maquina1, maquina2):
         print(maquina1)
@@ -29,7 +34,6 @@ class Thompson:
         punto_referencia = len(maquina2.estados) -1
 
         for estado in maquina1.estados:
-
             
             if estado.tipo == 1:
                 estado.etiqueta = "s" + str(punto_referencia)
@@ -44,7 +48,45 @@ class Thompson:
 
             estados.append(estado)
         
-        self.maquinas.append(AFN(estados,[],[]))    
+        self.maquinas.append(AFN(estados,[],[])) 
+
+
+
+    def asterisco(self, auotomata):
+        estados = []
+        estado_inicial = Estado("s0",
+                                [Transicion("s1","E"),
+                                    Transicion("s"+str(len(auotomata.estados)+1),"E")],
+                                        1)
+        # --------
+        estado_final = Estado("s"+str((len(auotomata.estados)+1)),[],3)
+
+        
+        auotomata.estados[0].tipo = 2
+        auotomata.estados[-1].tipo = 2
+        auotomata.estados[-1].transiciones.append(Transicion("s0","E"))
+        auotomata.estados[-1].transiciones.append(Transicion("s"+str(len(auotomata.estados)),"E"))
+
+        # -------
+
+        estados.append(estado_inicial)
+
+        for s in auotomata.estados:
+            s.etiqueta = "s"+ str((int(s.etiqueta[1])+ 1))
+            for t in s.transiciones:
+                t.destino = "s" + str((int(t.destino[1])+ 1))
+            estados.append(s)
+
+        estados.append(estado_final)
+        self.maquinas.append(AFN(estados,[],[]))
+
+    
+    def plus(self,nfa1):
+        nfa2 = copy.deepcopy(nfa1)
+        self.asterisco(nfa1)
+        self.concatenacion(self.maquinas.pop(),nfa2)
+
+
 
 
 
