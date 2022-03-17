@@ -4,6 +4,7 @@ from Estado import *
 import copy
 from transicion import *
 from AFN import *
+from subconjuntos import *
 import graphviz 
 
 class Thompson:
@@ -23,8 +24,11 @@ class Thompson:
         # print(self.maquinas)
         # self.graficar()
         #self.plus(self.maquinas.pop())
-        self.OR(self.maquinas.pop(), self.maquinas.pop() )
-        self.graficar()
+        # self.OR(self.maquinas.pop(), self.maquinas.pop() )
+        # self.validacion(self.maquinas, self.expresion_regular)
+        # self.graficar()
+
+        self.simulacion_afn()
 
     def concatenacion(self, maquina1, maquina2):
         print(maquina1)
@@ -128,10 +132,6 @@ class Thompson:
         self.paso_base("E")
         self.OR(self.maquinas.pop(),automata)
 
-
-
-
-
     #paso base
     #ir de estado inicial a final con un caracter
     #t1 iniical, t2 normal, t3 final ok
@@ -160,6 +160,69 @@ class Thompson:
                 afn.edge(estado.etiqueta, transi.destino, label=transi.caracter)
         
         afn.view()
+    
+
+    def move(self,states,chr):
+        response = []
+        for s in states:
+            for i in s.transaccion:
+                if i.trans_label == chr:
+                    estado = None
+                    for st in self.fragments[0].estados:
+                        if st.label == i.destino:
+                            estado = st
+                    if estado is not None and estado not in response:
+                        response.append(estado)
+                    elif s not in response:
+                        response.append(s)
+
+        return response
+
+    def eClosure(self,states):
+        verify = []
+        while True:
+            siguiente =[]
+            for s in states:
+                if s.tipo == 3:
+                    siguiente.append(s)
+                    for i in s.transiciones:
+                        if i.labels == "E":
+                            estado = None
+                            for st in self.maquinas[0].estados:
+                                if st.etiqueta == i.destino:
+                                    estado = st
+                                    break
+                            if estado is not None and estado not in siguiente:
+                                siguiente.append(estado)
+
+                                verify.append(estado)
+                        elif s not in siguiente:
+                            siguiente.append(s)
+            states = siguiente
+            if len(verify) == 0:
+                return siguiente
+            verify = []
+
+        return siguiente
+
+    def simulacion_afn(self,afn,cadena):
+        estados = [afn.estados[0]]
+        estados = self.eClosure(estados)
+        for i in cadena:
+            estados = self.eClosure(self.move(estados,i))
+
+        print(estados)
+        return  afn.estados[-1] in estados
+
+
+        
+
+
+
+
+
+
+
 
 
 
