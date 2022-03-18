@@ -33,15 +33,3 @@ class AnalizadorLexico:
         pila.append(caracter)
 
         return ''.join(postfix) 
-
-
-                
-
-
-
-        
-
-        
-
-
-

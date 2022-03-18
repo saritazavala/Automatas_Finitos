@@ -5,6 +5,7 @@ import copy
 from transicion import *
 from AFN import *
 from subconjuntos import *
+from operator import attrgetter
 import graphviz 
 
 class Thompson:
@@ -178,32 +179,58 @@ class Thompson:
 
         return response
 
+    
     def eClosure(self,states):
-        verify = []
         while True:
-            siguiente =[]
+            siguiente =[]    
             for s in states:
-                if s.tipo == 3:
-                    siguiente.append(s)
+                    if s.tipo == 3 and s not in siguiente:
+                        siguiente.append(s)
+
                     for i in s.transiciones:
-                        if i.labels == "E":
+                        if i.trans_label == "E":
+                            #estado =list( filter(lambda x: x.label == i.destino,states))
                             estado = None
                             for st in self.maquinas[0].estados:
                                 if st.etiqueta == i.destino:
                                     estado = st
                                     break
-                            if estado is not None and estado not in siguiente:
-                                siguiente.append(estado)
+                            if estado is not None: 
+                                if estado not in siguiente:
 
-                                verify.append(estado)
+                                    if s not in siguiente:
+                                        siguiente.append(s)
+                                    siguiente.append(estado)
+                            elif s not in siguiente:
+                                siguiente.append(s)                    
+                                
                         elif s not in siguiente:
                             siguiente.append(s)
+            siguiente.sort(key =attrgetter("label"),reverse=False)
+            if states == siguiente:
+                return siguiente  
             states = siguiente
-            if len(verify) == 0:
-                return siguiente
-            verify = []
-
         return siguiente
+
+    
+    def move2(self,states,chr,maquina):
+        response = []
+        for s in states:
+            for i in s.transaccion:
+                if i.trans_label == chr:
+                    estado = None
+                    for st in maquina.estados:
+                        if st.label == i.destino:
+                            estado = st    
+                    if estado is not None:
+                        if estado not in response:
+                            response.append(estado)
+                    elif s not in response:
+                            response.append(s)
+
+        return response
+
+
 
     def simulacion_afn(self,afn,cadena):
         estados = [afn.estados[0]]
@@ -215,35 +242,3 @@ class Thompson:
         return  afn.estados[-1] in estados
 
 
-        
-
-
-
-
-
-
-
-
-
-
-            
-
-
-        
-
-        
-
-
-
-        
-
-        
-
-
-
-
-        
-        
-
-    
-    
