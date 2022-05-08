@@ -261,7 +261,6 @@ class Thompson:
         estados = self.eClosure(estados)
         for i in cadena:
             estados = self.eClosure(self.move(estados,i))
-
         return  afn.estados[-1] in estados
 
     

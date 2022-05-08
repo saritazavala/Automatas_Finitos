@@ -1,0 +1,8 @@
+digraph {
+	node [shape=doublecircle]
+	B0
+	node [shape=ellipse]
+	A0
+	A0 -> B0 [label=b]
+	A0 -> B0 [label=a]
+}
