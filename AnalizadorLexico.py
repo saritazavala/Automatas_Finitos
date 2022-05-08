@@ -2,6 +2,18 @@
 class AnalizadorLexico:
     def __init__(self, expresion_regular):
         self.expresion_regular =  expresion_regular
+
+
+    def alfabeto(self, string):
+        operadores = ['*', '+','?', '.', "|", "(", ")"]
+        caracteres = []
+        for x in string:
+            if x not in operadores and x not in caracteres:
+                caracteres.append(x)
+        
+        return caracteres
+
+
     
     def convertir_postfix(self):
         operadores = {'*': 5, '+': 4, '?': 3, '.': 2, '|': 1}
@@ -31,5 +43,6 @@ class AnalizadorLexico:
             postfix.append(pila[-1])
             pila = pila[:-1]
         pila.append(caracter)
+        print(''.join(postfix) )
 
         return ''.join(postfix) 
