@@ -36,7 +36,6 @@ def verificador(caracter):
     operadores = ['*', '+','?', '.', "|", "(", ")"]
     return caracter not in operadores
 
-        
 # c = conversion("((a|b)c)*")
 # a = Thompson(c)
 # b = a.compilar()  
@@ -187,7 +186,6 @@ while True:
             print('---------------------------------------------------------------')
             print("Estados de aceptacion --> ", estados_aceoatacion_finales)
             print('---------------------------------------------------------------')
-            print("Tabla de transiciones --> ", trans_func)
             graficador_directo(estados, estado_inicial, estados_aceoatacion_finales, trans_func, "FinalDirecto")
 
 
